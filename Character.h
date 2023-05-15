@@ -25,6 +25,7 @@ public:
     int getMaxHealth();
     int getCurrentHealth();
     int getShield();
+    void setShield(int shield);
 };
 
 #endif

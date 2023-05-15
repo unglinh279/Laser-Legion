@@ -35,3 +35,7 @@ int Character::getCurrentHealth() {
 int Character::getShield() {
     return shield;
 }
+
+void Character::setShield(int shield) {
+    this->shield = shield;
+}

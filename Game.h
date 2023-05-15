@@ -6,6 +6,7 @@
 #include "Minion.h"
 #include "Character.h"
 #include "Card.h"
+#include "Boss.h"
 #include<bits/stdc++.h>
 
 using namespace std;

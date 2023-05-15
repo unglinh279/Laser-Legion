@@ -7,6 +7,8 @@ Player::Player(string name, int maxHealth, int maxBullet) {
     currentHealth = maxHealth;
     this->maxBullet = maxBullet;
     currentBullet = maxBullet;
+
+    isCrit = 0;
 }
 
 int Player::getMaxBullet() {
@@ -16,8 +18,8 @@ int Player::getCurrentBullet() {
     return currentBullet;
 }
 
-void Player::reload() {
-    currentBullet++;
+void Player::reload(int amount) {
+    currentBullet += amount;
     currentBullet = min(currentBullet, maxBullet);
 }
 

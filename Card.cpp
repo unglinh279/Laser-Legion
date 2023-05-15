@@ -16,8 +16,11 @@ void Card::use(Player* player, Character* target) {
     else if (type == "HEAL") {
         player->getHeal(amount);
     }
-    else if (type == "RELOAD") {
-        player->reload();
+    else if (type == "RECHARGE") {
+        player->reload(amount);
+    }
+    else if (type == "ALL") {
+        
     }
 }
 
