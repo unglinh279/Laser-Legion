@@ -21,13 +21,14 @@ private:
 
     Player* player;
 
+    void printTutorial();
+    int getInputInRange(int a, int b);
+    bool startRound(Player* player, int roundNumber);
     void displayStatus(Player* player, vector<Enemy*> enemies, vector<Card*> cards);
-
 public:
     Game();
     Game(string playerName);
 
-    bool startRound(Player* player, int roundNumber);
     void startGame();
 };
 

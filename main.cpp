@@ -5,10 +5,19 @@
 using namespace std;
 
 int main() {
-    cout << "Welcome! Enter player name: ";
     string playerName;
-    getline(cin, playerName);
 
+    while (true) {
+        std::cout << "Welcome! Enter a name (less than 13 characters): ";
+        std::getline(std::cin, playerName);
+        
+        if (playerName.length() < 13) {
+            break;
+        }
+        
+        std::cout << "Invalid input! Please enter a name less than 13 characters." << std::endl;
+    }
+    
     Game game(playerName);
     game.startGame();
 

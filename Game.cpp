@@ -67,6 +67,64 @@ Game::Game(string playerName) {
     };
 }
 
+void Game::printTutorial() {
+    std::cout << "Title: Laser Legion: Turn-Based Strategy Card Game Tutorial\n\n";
+
+    std::cout << "Introduction:\n";
+    std::cout << "Welcome to Laser Legion, a thrilling sci-fi, robotic-themed, turn-based strategy card game. Your mission is to defeat multiple enemies across 10 stages and face a challenging boss fight at the end. In this tutorial, we'll guide you through the game mechanics, card types, combat system, and strategies to help you emerge victorious.\n\n";
+
+    std::cout << "Game Objective:\n";
+    std::cout << "Defeat all enemies in each stage using a combination of strategic card plays and resource management. Survive through all 10 stages and overcome the final boss to claim victory.\n\n";
+
+    std::cout << "Game Mechanics:\n\n";
+    std::cout << "Card Types:\n";
+    std::cout << "a. Recharge Card: Use this card to gain additional orbs (maximum of 3) to spend on other cards.\n";
+    std::cout << "b. Attack Card: Deal damage to the enemy. Each attack card has a specific bullet cost and damage value.\n";
+    std::cout << "c. Heal Card: Restore your health. Heal cards affect the first enemy in the battle.\n";
+    std::cout << "d. Shield Card: Defend against enemy attacks. Shield cards also affect the first enemy.\n\n";
+
+    std::cout << "Energy Orbs:\n";
+    std::cout << "a. At the start of each fight, you have 3 orbs available to spend.\n";
+    std::cout << "b. Each card has a bullet cost. Spend orbs to use the cards you've drawn.\n";
+    std::cout << "c. You recharge 1 orbs each turn\n";
+    std::cout << "d. Using a Recharge card replenishes 1 energy orbs.\n\n";
+
+    std::cout << "Turn Structure:\n";
+    std::cout << "a. Each fight begins with your turn. Draw 4 random cards from your deck.\n";
+    std::cout << "b. Spend orbs to play cards and execute their effects. Alternatively, you can play a Reload card to replenish your bullets.\n";
+    std::cout << "c. You can end your turn at any time once you've played the desired cards.\n\n";
+
+    std::cout << "Enemy Abilities:\n";
+    std::cout << "a. After your turn, each enemy performs their ability.\n";
+    std::cout << "b. Enemies have two types of abilities:\n";
+    std::cout << "   i. Attack: Deals damage to you.\n";
+    std::cout << "   ii. Heal/Shield: Affects the first enemy, either healing or shielding them.\n";
+
+    this_thread::sleep_for(chrono::milliseconds(1000));
+}
+
+int Game::getInputInRange(int a, int b) {
+    int userInput;
+    std::string inputString;
+
+    while (true) {
+        std::cout << "Enter an integer from " << a << " to " << b << ": ";
+        std::getline(std::cin, inputString);
+
+        // Use stringstream to convert input to integer
+        std::stringstream ss(inputString);
+
+        if (ss >> userInput && ss.eof()) {
+            // Check if the integer is within the specified range
+            if (userInput >= a && userInput <= b) {
+                return userInput; // Return valid input
+            }
+        }
+
+        std::cout << "Invalid input. Please try again." << std::endl;
+    }
+}
+
 void Game::displayStatus(Player* player, vector<Enemy*> enemies, vector<Card*> cards) {
     cout << '\n' << '\n' << "========================================" << '\n'; 
     cout << player->getName() << '\n';
@@ -109,21 +167,17 @@ bool Game::startRound(Player* player, int roundNumber) {
     while(true) {
         shuffle(playerDeck.begin(), playerDeck.end(), mt19937{random_device{}()});
         cards.clear();
-        for (int i = 0; i < 5; i++) cards.push_back(playerDeck[i]);
+        for (int i = 0; i < 4; i++) cards.push_back(playerDeck[i]);
 
         while (true) {
             displayStatus(player, enemies, cards);
 
-            int choice;
-            while(true) {
-                cout << "Your choice: ";
-                cin >> choice;
-
-                if (choice < 0 || choice > cards.size())
-                    cout << "Invalid choice! Choose again" << '\n';
-                else if (choice != cards.size() && cards[choice]->getBulletCost() > player->getCurrentBullet())
-                    cout << "Not enough Energy Orbs! Choose again" << '\n';
-                else break; 
+            int choice = cards.size();
+            while (true) {
+                choice = getInputInRange(0, (int)cards.size());
+                if (choice != cards.size() && cards[choice]->getBulletCost() > player->getCurrentBullet())
+                    cout << "Not enough Energy Orbs!\n";
+                else break;
             }
 
             if (choice == cards.size()) break;
@@ -131,15 +185,8 @@ bool Game::startRound(Player* player, int roundNumber) {
                 cout << '\n';
 
                 if (cards[choice]->getType() == "ATTACK") {
-                    int target;
-                    while(true) {
-                        cout << "Choose target (0" << " - " << enemies.size()-1 << "): ";
-                        cin >> target;
+                    int target = getInputInRange(0, enemies.size()-1);
 
-                        if (target < 0 || target > enemies.size())
-                            cout << "Invalid target! Choose again";
-                        else break; 
-                    }
                     cards[choice]->use(player, enemies[target]);
                     if (enemies[target]->isDead()) {
                         cout << enemies[target]->getName() << " defeated!" << '\n';
@@ -184,6 +231,8 @@ bool Game::startRound(Player* player, int roundNumber) {
 void Game::startGame() {
     player = new Player(playerName, 50, 3);
 
+    printTutorial();
+
     for (int round = 0; round < levels.size(); round++) {
         if (!startRound(player, round)) {
             cout << "YOU DIED" << '\n';
@@ -193,19 +242,18 @@ void Game::startGame() {
             return;
         }
 
-
         cout << "CONGRATS!" << '\n';
         this_thread::sleep_for(chrono::milliseconds(1000));
         cout << "ROUND " << round << " WON!" << '\n';
         this_thread::sleep_for(chrono::milliseconds(1000));
-        cout << "You healed for 5, reload to full, and all shield removed" << '\n';
+        cout << '\n' << "You healed for 5, reload to full, and all shield removed" << '\n';
         this_thread::sleep_for(chrono::milliseconds(2000));
 
         player->setShield(0);
         player->getHeal(5);
         player->reload(3);
 
-        cout << "You can pick 1 of 4 new cards to add to your deck:" << '\n';
+        cout << '\n' << "You can pick 1 of 4 new cards to add to your deck:" << '\n';
         shuffle(allCards.begin(), allCards.end(), mt19937{random_device{}()});
         for (int i = 0; i < 4; i++) {
             Card* card = allCards[i];
@@ -215,15 +263,7 @@ void Game::startGame() {
                 << "\t Cost: " << card->getBulletCost() 
                 << '\n';
         }
-        int choice;
-        while(true) {
-            cout << "Your choice: ";
-            cin >> choice;
-
-            if (choice < 0 || choice > 3)
-                cout << "Invalid choice! Choose again" << '\n';
-            else break; 
-        }
+        int choice = getInputInRange(0, 3);
         this_thread::sleep_for(chrono::milliseconds(1000));
         cout << "Nice! " << allCards[choice]->getName() << " has been added to your deck" << '\n';
         playerDeck.push_back(allCards[choice]);
