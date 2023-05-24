@@ -5,9 +5,7 @@
 
 class Boss : public Enemy {
 private:
-    int attack;
-    int shield;
-    int heal;
+    int* stat; //attack - shield - heal;
 public:
     Boss();
     Boss(string name, int maxHealth, int attack, int shield, int heal);
@@ -19,6 +17,10 @@ public:
     }
     int getAmount() override {
         return 0;
+    }
+
+    ~Boss() {
+        delete stat;
     }
 };
 

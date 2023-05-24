@@ -39,3 +39,7 @@ int Character::getShield() {
 void Character::setShield(int shield) {
     this->shield = shield;
 }
+
+void Character::setCurrentHealth(int health) {
+    this->currentHealth = health;
+}

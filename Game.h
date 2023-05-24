@@ -1,18 +1,19 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "Player.h"
-#include "Enemy.h"
-#include "Minion.h"
-#include "Character.h"
+#include "Characters/Player.h"
+#include "Characters/Enemy.h"
+#include "Characters/Minion.h"
+#include "Characters/Character.h"
 #include "Card.h"
-#include "Boss.h"
+#include "Characters/Boss.h"
 #include<bits/stdc++.h>
 
 using namespace std;
 
 class Game {
 private:
+    int round;
     string playerName;
     vector<vector<Enemy*> > levels;
 
@@ -29,6 +30,9 @@ public:
     Game();
     Game(string playerName);
 
+    void checkSave(const string& filename);
+    void saveGame(const string& filename);
+    void loadGame(const string& filename);
     void startGame();
 };
 

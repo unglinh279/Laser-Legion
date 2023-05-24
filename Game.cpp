@@ -16,8 +16,10 @@ Enemy* regenerator() {return new Minion("Bio-Regenerator", 6, "HEAL", 12);}
 Game::Game() = default;
 Game::Game(string playerName) {
     this->playerName = playerName;
+    round = 1;
 
     levels = {
+        {},
         {assault()},
         {calvary()},
         {calvary(), vanguard()},
@@ -27,7 +29,7 @@ Game::Game(string playerName) {
         {harbinger(), vanguard(), medic()},
         {warden(), assault(), calvary()},
         {harbinger(), calvary(), sentinel(), regenerator()},
-        {new Boss("Dr. Cygnus", 40, 12, 6, 6), sniper(), sentinel()},
+        {new Boss("Dr. Cygnus", 40, 12, 4, 4), sniper(), sentinel()},
     };
 
     allCards = {
@@ -100,7 +102,8 @@ void Game::printTutorial() {
     std::cout << "   i. Attack: Deals damage to you.\n";
     std::cout << "   ii. Heal/Shield: Affects the first enemy, either healing or shielding them.\n";
 
-    this_thread::sleep_for(chrono::milliseconds(1000));
+    std::cout << "Press any key to continue..." << '\n';
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
 int Game::getInputInRange(int a, int b) {
@@ -125,40 +128,170 @@ int Game::getInputInRange(int a, int b) {
     }
 }
 
-void Game::displayStatus(Player* player, vector<Enemy*> enemies, vector<Card*> cards) {
-    cout << '\n' << '\n' << "========================================" << '\n'; 
-    cout << player->getName() << '\n';
-    cout << "HP: " << player->getCurrentHealth() << "/" << player->getMaxHealth() << '\t' << "Energy: " << player->getCurrentBullet() << "/" << player->getMaxBullet() << '\n';
-    if (player->getShield() > 0) cout << "Shield: " << player->getShield() << '\n';
+void Game::checkSave(const string& filename) {
+    std::ifstream file(filename);
+
+    if (!file.good()) return;
+
+    std::cout << "Previous save file found." << std::endl;
+    std::cout << "(0) Start over" << std::endl;
+    std::cout << "(1) View save file" << std::endl;
+    std::cout << "(2) Load save file" << std::endl;
+
+    std::cout << "Enter your choice: ";
+    int choice = getInputInRange(0, 2);
+
+    if (choice == 0) {
+        // Start over
+        std::cout << "Starting a new game... \n" << std::endl;
+        this_thread::sleep_for(chrono::milliseconds(2000));
+        return;
+    } 
+    else if (choice == 1) {
+        // View save file
+        std::cout << '\n';
+        std::ifstream saveFile("GameSave.txt");
+        if (saveFile.is_open()) {
+            std::string line;
+            bool printLine = true;
+            while (std::getline(saveFile, line)) {
+                if (line == "All Cards: ") {
+                    // Skip printing the "All Cards" section
+                    printLine = false;
+                }
+                if (printLine) {
+                    std::cout << line << std::endl;
+                }
+                if (line.empty()) {
+                    // Reset the flag after printing an empty line
+                    printLine = true;
+                }
+            }
+            saveFile.close();
+        } 
+        else std::cout << "Error: Unable to open the save file." << std::endl;
+        this_thread::sleep_for(chrono::milliseconds(2000));
+        std::cout << '\n';
+        checkSave(filename);
+    }
+    else if (choice == 2) {
+        // Load save file
+        std::cout << "Loading the save file... \n" << std::endl;
+        loadGame(filename);
+        return;
+    }
+    std::cout << '\n';
+}
+void Game::saveGame(const string& filename) {
+    ofstream file(filename);
+
+    this_thread::sleep_for(chrono::milliseconds(2000));
+    if (file.is_open()) {
+        file << "Player Name: " << playerName << '\n' << '\n';
+
+        file << "Round: " << round+1 << '\n' << '\n';
+
+        file << "All Cards: " << '\n';
+        for (const auto& card : allCards)
+            file << "\"" << card->getName() << "\"" << ' ' << card->getBulletCost() << ' ' << card->getType() << ' ' << card->getAmount() << '\n';
+
+        file << '\n';
+
+        file << "Player Deck: " << '\n';
+        for (const auto& card : playerDeck)
+            file << "\"" << card->getName() << "\"" << ' ' << card->getBulletCost() << ' ' << card->getType() << ' ' << card->getAmount() << '\n';
         
-    cout << "========================================" << '\n';
+        file << '\n';
+
+        file << "Player HP: " << player->getCurrentHealth() << '\n';
+
+        file.close();
+        std::cout << "Game saved successfully!" << '\n';
+    }
+    else {
+        std::cout << "Error: Unable to open file" << '\n';
+    }
+}
+void Game::loadGame(const string& filename) {
+    allCards.clear();
+    playerDeck.clear();
+
+    ifstream file(filename);
+
+    this_thread::sleep_for(chrono::milliseconds(2000));
+
+    if (file.is_open()) {
+        string line;
+        while (getline(file, line)) {
+            if (line.find("Player Name: ") != string::npos) {
+                playerName = line.substr(12);
+            }
+            else if (line.find("Round: ") != string::npos) {
+                string roundStr = line.substr(7);
+                round = stoi(roundStr);
+            }
+            else if (line == "All Cards: ") {
+                while (getline(file, line) && !line.empty()) {
+                    istringstream iss(line);
+                    string name, type;
+                    int cost, amount;
+                    iss >> quoted(name) >> cost >> type >> amount;
+                    allCards.push_back(new Card(name, cost, type, amount));
+                }
+            }
+            else if (line == "Player Deck: ") {
+                while (getline(file, line) && !line.empty()) {
+                    istringstream iss(line);
+                    string name, type;
+                    int cost, amount;
+                    iss >> quoted(name) >> cost >> type >> amount;
+                    playerDeck.push_back(new Card(name, cost, type, amount));
+                }
+            }
+            else if (line == "Player HP: ") {
+                string hpStr = line.substr(11);
+                int HP = stoi(hpStr);
+                player->setCurrentHealth(HP);
+            }
+        }
+        
+        file.close();
+        std::cout << "Game loaded successfully! \n\n";
+    }
+    else {
+        std::cout << "Error: Unable to open file \n\n";
+    }
+}
+
+void Game::displayStatus(Player* player, vector<Enemy*> enemies, vector<Card*> cards) {
+    std::cout << '\n' << '\n' << "========================================" << '\n'; 
+    std::cout << player->getName() << '\n';
+    std::cout << "HP: " << player->getCurrentHealth() << "/" << player->getMaxHealth() << '\t' << "Energy: " << player->getCurrentBullet() << "/" << player->getMaxBullet() << '\n';
+    if (player->getShield() > 0) std::cout << "Shield: " << player->getShield() << '\n';
+        
+    std::cout << "========================================" << '\n';
     
     for (Enemy* em : enemies) {
-        cout << em->getName() << '\n';
-        cout << "HP: " << em->getCurrentHealth() << "/" << em->getMaxHealth() << '\n';
+        std::cout << em->getName() << '\n';
+        std::cout << "HP: " << em->getCurrentHealth() << "/" << em->getMaxHealth() << '\n';
         if (em->getType() == "BOSS")
-            cout << "Type: BOSS: ?!?" << '\n';
+            std::cout << "Type: BOSS: ?!?" << '\n';
         else
-            cout << "Type: " << em->getType() << ": " << em->getAmount() << '\n';
-        if (em->getShield() > 0) cout << "Shield: " << em->getShield() << '\n';
-        cout << '\n';
+            std::cout << "Type: " << em->getType() << ": " << em->getAmount() << '\n';
+        if (em->getShield() > 0) std::cout << "Shield: " << em->getShield() << '\n';
+        std::cout << '\n';
     }
-    cout << "========================================" << '\n';
-    cout << "Cards: " << '\n';
+    std::cout << "========================================" << '\n';
+    std::cout << "Cards: " << '\n';
     for (int i = 0; i < cards.size(); i++) {
-        Card* card = cards[i];
-        cout << "(" << i << "): " << std::left << std::setw(18) << card->getName() 
-            << card->getType() 
-            << "\t for " << card->getAmount() 
-            << "\t Cost: " << card->getBulletCost() 
-            << '\n';
+        std::cout << "(" << i << "): " << *cards[i] << '\n';
     }
 
-    cout << "(" << cards.size() << "): End turn" << '\n';
+    std::cout << "(" << cards.size() << "): End turn" << '\n';
 }
 
 bool Game::startRound(Player* player, int roundNumber) {
-    cout << "Round: " << roundNumber << '\n';
+    std::cout << "Round: " << roundNumber << '\n';
     this_thread::sleep_for(chrono::milliseconds(2000));
     
     vector<Enemy*> enemies = levels[roundNumber];
@@ -174,22 +307,24 @@ bool Game::startRound(Player* player, int roundNumber) {
 
             int choice = cards.size();
             while (true) {
+                std::cout << "Choose card to play: \n";
                 choice = getInputInRange(0, (int)cards.size());
                 if (choice != cards.size() && cards[choice]->getBulletCost() > player->getCurrentBullet())
-                    cout << "Not enough Energy Orbs!\n";
+                    std::cout << "Not enough Energy Orbs!\n";
                 else break;
             }
 
             if (choice == cards.size()) break;
             else {
-                cout << '\n';
+                std::cout << '\n';
 
                 if (cards[choice]->getType() == "ATTACK") {
+                    std::cout << "Choose target: \n";
                     int target = getInputInRange(0, enemies.size()-1);
 
                     cards[choice]->use(player, enemies[target]);
                     if (enemies[target]->isDead()) {
-                        cout << enemies[target]->getName() << " defeated!" << '\n';
+                        std::cout << enemies[target]->getName() << " defeated!" << '\n';
                         this_thread::sleep_for(chrono::milliseconds(1000));
                         enemies.erase(enemies.begin() + target);
                     }
@@ -197,7 +332,7 @@ bool Game::startRound(Player* player, int roundNumber) {
                 else if (cards[choice]->getType() == "MELEE") {
                     cards[choice]->use(player, enemies[0]);
                     if (enemies[0]->isDead()) {
-                        cout << enemies[0]->getName() << " defeated!" << '\n';
+                        std::cout << enemies[0]->getName() << " defeated!" << '\n';
                         this_thread::sleep_for(chrono::milliseconds(1000));
                         enemies.erase(enemies.begin());
                     }                
@@ -222,7 +357,7 @@ bool Game::startRound(Player* player, int roundNumber) {
         }
         this_thread::sleep_for(chrono::milliseconds(1000));
 
-        cout << player->getName() << " RECHARGE once" << '\n';
+        std::cout << player->getName() << " RECHARGE once" << '\n';
         player->reload(1);
         this_thread::sleep_for(chrono::milliseconds(1000));
     }
@@ -233,49 +368,63 @@ void Game::startGame() {
 
     printTutorial();
 
-    for (int round = 0; round < levels.size(); round++) {
+    checkSave("GameSave.txt");
+
+    for (; round < levels.size(); round++) {
         if (!startRound(player, round)) {
-            cout << "YOU DIED" << '\n';
+            std::cout << "YOU DIED" << '\n';
             this_thread::sleep_for(chrono::milliseconds(1000));
-            cout << "GAME OVER" << '\n';
+            std::cout << "GAME OVER" << '\n';
             this_thread::sleep_for(chrono::milliseconds(3000));
             return;
         }
 
-        cout << "CONGRATS!" << '\n';
+        std::cout << " \nCONGRATS! \n";
         this_thread::sleep_for(chrono::milliseconds(1000));
-        cout << "ROUND " << round << " WON!" << '\n';
+        std::cout << "ROUND " << round << " WON!" << '\n';
         this_thread::sleep_for(chrono::milliseconds(1000));
-        cout << '\n' << "You healed for 5, reload to full, and all shield removed" << '\n';
+        std::cout << '\n' << "You healed for 5, reload to full, and all shield removed" << '\n';
         this_thread::sleep_for(chrono::milliseconds(2000));
 
         player->setShield(0);
         player->getHeal(5);
         player->reload(3);
 
-        cout << '\n' << "You can pick 1 of 4 new cards to add to your deck:" << '\n';
+        std::cout << '\n' << "You can pick 1 of 4 new cards to add to your deck:" << '\n';
         shuffle(allCards.begin(), allCards.end(), mt19937{random_device{}()});
-        for (int i = 0; i < 4; i++) {
-            Card* card = allCards[i];
-            cout << "(" << i << "): " << std::left << std::setw(20) << card->getName() 
-                << card->getType() 
-                << "\t for " << card->getAmount() 
-                << "\t Cost: " << card->getBulletCost() 
-                << '\n';
-        }
+        for (int i = 0; i < 4; i++) 
+            std::cout << "(" << i << "): " << *allCards[i] << '\n';
+
         int choice = getInputInRange(0, 3);
         this_thread::sleep_for(chrono::milliseconds(1000));
-        cout << "Nice! " << allCards[choice]->getName() << " has been added to your deck" << '\n';
+        std::cout << "Nice! " << allCards[choice]->getName() << " has been added to your deck \n\n";
         playerDeck.push_back(allCards[choice]);
         allCards.erase(allCards.begin() + choice);
         this_thread::sleep_for(chrono::milliseconds(2000));
+
+        std::cout << "Do you want to save current game state? (Y/N)";
+        std::string saveInput;
+
+        while (true) {
+            getline(std::cin, saveInput);
+
+            if (saveInput.length() == 1 && (saveInput[0] == 'Y' || saveInput[0] == 'N')) {
+                if (saveInput[0] == 'Y') {
+                    saveGame("GameSave.txt");
+                    break;
+                }
+                else if (saveInput[0] == 'N') break;
+            }
+
+            std::cout << "Invalid input. Please enter 'Y' or 'N' \n";
+        }
     }
 
-    cout << "YOU WON THE GAME!" << '\n';
+    std::cout << "YOU WON THE GAME!" << '\n';
     this_thread::sleep_for(chrono::milliseconds(1000));
-    cout << "Here's a cake:" << '\n';
+    std::cout << "Here's a cake:" << '\n';
     this_thread::sleep_for(chrono::milliseconds(1000));
-    cout << " {\\__/} \n (• . •) \n / >🎂" << '\n';
+    std::cout << " {\\__/} \n (• . •) \n / >🎂" << '\n';
     this_thread::sleep_for(chrono::milliseconds(5000));
     return;
 }

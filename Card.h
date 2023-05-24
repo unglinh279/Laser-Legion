@@ -2,8 +2,8 @@
 #define CARD_H
 
 #include<bits/stdc++.h>
-#include "Character.h"
-#include "Player.h"
+#include "Characters/Character.h"
+#include "Characters/Player.h"
 using namespace std;
 
 class Card {
@@ -21,6 +21,14 @@ public:
     string getType();
     int getAmount();
     int getBulletCost();
+
+    friend ostream& operator <<(ostream& os, const Card& card) {
+        os << std::left << std::setw(25) 
+        << card.name << card.type
+        << "\t for " << card.amount 
+        << "\t Cost: " << card.bulletCost;
+        return os;
+    }
 };
 
 #endif

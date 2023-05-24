@@ -1,0 +1,35 @@
+Player Name: Linh
+
+Round: 3
+
+All Cards: 
+"Heavy Repair" 2 HEAL 10
+"Barrier" 1 SHIELD 6
+"Reconstruction" 3 HEAL 20
+"Repair" 1 HEAL 6
+"Overcharged Blast" 3 ATTACK 30
+"Recharge+" 0 RECHARGE 2
+"Force Field" 2 SHIELD 10
+"Double Slash" 0 MELEE 10
+"Charged Blast" 2 ATTACK 14
+"Barrier" 1 SHIELD 6
+"Force Field" 2 SHIELD 10
+"Double Slash" 0 MELEE 10
+"Charged Blast" 2 ATTACK 14
+
+Player Deck: 
+"Heavy Repair" 2 HEAL 10
+"Barrier" 1 SHIELD 6
+"Reconstruction" 3 HEAL 20
+"Repair" 1 HEAL 6
+"Overcharged Blast" 3 ATTACK 30
+"Recharge+" 0 RECHARGE 2
+"Force Field" 2 SHIELD 10
+"Double Slash" 0 MELEE 10
+"Charged Blast" 2 ATTACK 14
+"Barrier" 1 SHIELD 6
+"Force Field" 2 SHIELD 10
+"Double Slash" 0 MELEE 10
+"Charged Blast" 2 ATTACK 14
+
+Player HP: 47
