@@ -1,4 +1,4 @@
-# Title: Laser Legion: Turn-Based Strategy Card Game Tutorial
+# Title: Laser Legion: Turn-Based Strategy Card Game
 
 Introduction:
 Welcome to Laser Legion, a thrilling sci-fi, robotic-themed, turn-based strategy card game. Your mission is to defeat multiple enemies across 10 stages and face a challenging boss fight at the end. In this tutorial, we'll guide you through the game mechanics, card types, combat system, and strategies to help you emerge victorious.
