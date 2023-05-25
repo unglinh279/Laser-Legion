@@ -2,8 +2,8 @@
 #define CARD_H
 
 #include<bits/stdc++.h>
-#include "Characters/Character.h"
-#include "Characters/Player.h"
+#include "Character.h"
+#include "Player.h"
 using namespace std;
 
 class Card {

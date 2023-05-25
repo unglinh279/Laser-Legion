@@ -1,35 +1,31 @@
-Player Name: Linh
+Player Name: Linhx
 
-Round: 3
+Round: 8
 
 All Cards: 
-"Heavy Repair" 2 HEAL 10
-"Barrier" 1 SHIELD 6
 "Reconstruction" 3 HEAL 20
 "Repair" 1 HEAL 6
-"Overcharged Blast" 3 ATTACK 30
 "Recharge+" 0 RECHARGE 2
 "Force Field" 2 SHIELD 10
-"Double Slash" 0 MELEE 10
-"Charged Blast" 2 ATTACK 14
 "Barrier" 1 SHIELD 6
-"Force Field" 2 SHIELD 10
-"Double Slash" 0 MELEE 10
+"Heavy Repair" 2 HEAL 10
+"Photon Blast" 1 ATTACK 8
 "Charged Blast" 2 ATTACK 14
 
 Player Deck: 
-"Heavy Repair" 2 HEAL 10
-"Barrier" 1 SHIELD 6
-"Reconstruction" 3 HEAL 20
 "Repair" 1 HEAL 6
-"Overcharged Blast" 3 ATTACK 30
-"Recharge+" 0 RECHARGE 2
-"Force Field" 2 SHIELD 10
-"Double Slash" 0 MELEE 10
+"Photon Blast" 1 ATTACK 8
+"Recharge" 0 RECHARGE 1
 "Charged Blast" 2 ATTACK 14
 "Barrier" 1 SHIELD 6
-"Force Field" 2 SHIELD 10
 "Double Slash" 0 MELEE 10
-"Charged Blast" 2 ATTACK 14
+"Recharge" 0 RECHARGE 1
+"Double Slash" 0 MELEE 10
+"Slash" 0 MELEE 6
+"Barrier" 1 SHIELD 6
+"Overcharged Blast" 3 ATTACK 30
+"Force Field" 2 SHIELD 10
+"Photon Blast" 1 ATTACK 8
+"Recharge+" 0 RECHARGE 2
 
-Player HP: 47
+Player HP: 50

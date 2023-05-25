@@ -1,20 +1,23 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "Characters/Player.h"
-#include "Characters/Enemy.h"
-#include "Characters/Minion.h"
-#include "Characters/Character.h"
+#include "Player.h"
+#include "Enemy.h"
+#include "Minion.h"
+#include "Character.h"
 #include "Card.h"
-#include "Characters/Boss.h"
+#include "Boss.h"
+#include "System.h"
 #include<bits/stdc++.h>
 
 using namespace std;
 
 class Game {
 private:
+    const string SAVEFILE = "GameSave.txt";
+
+    System system;
     int round;
-    string playerName;
     vector<vector<Enemy*> > levels;
 
     vector<Card*> allCards;
@@ -22,18 +25,16 @@ private:
 
     Player* player;
 
-    void printTutorial();
-    int getInputInRange(int a, int b);
-    bool startRound(Player* player, int roundNumber);
+    bool startRound(Player* player);
     void displayStatus(Player* player, vector<Enemy*> enemies, vector<Card*> cards);
 public:
     Game();
-    Game(string playerName);
 
-    void checkSave(const string& filename);
     void saveGame(const string& filename);
     void loadGame(const string& filename);
     void startGame();
+
+    void setNewPlayer();
 };
 
 #endif
